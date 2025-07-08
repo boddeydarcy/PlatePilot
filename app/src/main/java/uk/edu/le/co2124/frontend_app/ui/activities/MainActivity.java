@@ -1,16 +1,18 @@
 package uk.edu.le.co2124.frontend_app.ui.activities;
 
+import static androidx.fragment.app.FragmentManagerKt.commit;
+
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import android.content.Intent;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import uk.edu.le.co2124.frontend_app.R;
+import uk.edu.le.co2124.frontend_app.ui.fragments.MainsFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,35 +28,26 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Find and set the profile initials TextView
+        // Find and set profile initials
         profileInitials = findViewById(R.id.profileInitials);
+        String fullName = "Darcy Boddey"; // Replace with real user session data
+        profileInitials.setText(getInitials(fullName));
 
-        // Example full name (replace with real user data later)
-        String fullName = "Darcy Boddey"; // Replace with session/user data
-        String initials = getInitials(fullName);
-        profileInitials.setText(initials);
-
-        // Profile click action
         profileInitials.setOnClickListener(v -> {
             Toast.makeText(this, "Profile clicked", Toast.LENGTH_SHORT).show();
             // TODO: Navigate to profile screen
         });
 
-        // Set up the "New Order" button
+        // Set up New Order button (launches NewOrderActivity)
         newOrderButton = findViewById(R.id.newOrderButton);
         newOrderButton.setOnClickListener(v -> {
             Toast.makeText(this, "Starting new order...", Toast.LENGTH_SHORT).show();
-            // TODO: Navigate to new order screen
-        });
-
-        newOrderButton.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, NewOrderActivity.class);
             startActivity(intent);
         });
-
     }
 
-    // Helper to extract initials from a full name
+    // Extract initials from full name
     private String getInitials(String fullName) {
         if (fullName == null || fullName.trim().isEmpty()) return "";
         String[] parts = fullName.trim().split(" ");

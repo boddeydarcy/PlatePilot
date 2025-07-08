@@ -10,6 +10,8 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 import uk.edu.le.co2124.frontend_app.ui.adapters.CategoryPagerAdapter;
 import uk.edu.le.co2124.frontend_app.R;
+import uk.edu.le.co2124.frontend_app.ui.fragments.MainsFragment;
+import uk.edu.le.co2124.frontend_app.ui.fragments.StartersFragment;
 
 public class NewOrderActivity extends AppCompatActivity {
 

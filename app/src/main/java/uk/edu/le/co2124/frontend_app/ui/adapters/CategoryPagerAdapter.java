@@ -13,7 +13,6 @@ import uk.edu.le.co2124.frontend_app.ui.fragments.SidesFragment;
 import uk.edu.le.co2124.frontend_app.ui.fragments.StartersFragment;
 
 public class CategoryPagerAdapter extends FragmentStateAdapter {
-
     public CategoryPagerAdapter(@NonNull FragmentActivity fa) {
         super(fa);
     }
@@ -27,7 +26,7 @@ public class CategoryPagerAdapter extends FragmentStateAdapter {
             case 2: return new DessertsFragment();
             case 3: return new SidesFragment();
             case 4: return new DrinksFragment();
-            default: return ItemListFragment.newInstance("Other");
+            default: return new StartersFragment();
         }
     }
 

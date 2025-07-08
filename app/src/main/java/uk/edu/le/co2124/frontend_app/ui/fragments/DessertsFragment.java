@@ -1,5 +1,6 @@
 package uk.edu.le.co2124.frontend_app.ui.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,7 @@ import uk.edu.le.co2124.frontend_app.BasketManager;
 import uk.edu.le.co2124.frontend_app.R;
 import uk.edu.le.co2124.frontend_app.adapters.MenuAdapter;
 import uk.edu.le.co2124.frontend_app.data.MenuItem;
+import uk.edu.le.co2124.frontend_app.ui.activities.BasketActivity;
 
 public class DessertsFragment extends Fragment {
 
@@ -77,8 +79,9 @@ public class DessertsFragment extends Fragment {
         loadDesserts(subCategories[0]);
         updateBasketButton();
 
-        viewBasketButton.setOnClickListener(v ->
-                Toast.makeText(getContext(), "Tab clicked", Toast.LENGTH_SHORT).show());
+        viewBasketButton.setOnClickListener(v -> {
+            startActivity(new Intent(getContext(), BasketActivity.class));
+        });
     }
 
     private void updateBasketButton() {

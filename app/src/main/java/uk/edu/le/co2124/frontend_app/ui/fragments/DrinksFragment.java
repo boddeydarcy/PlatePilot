@@ -1,5 +1,6 @@
 package uk.edu.le.co2124.frontend_app.ui.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,7 @@ import uk.edu.le.co2124.frontend_app.BasketManager;
 import uk.edu.le.co2124.frontend_app.R;
 import uk.edu.le.co2124.frontend_app.adapters.MenuAdapter;
 import uk.edu.le.co2124.frontend_app.data.MenuItem;
+import uk.edu.le.co2124.frontend_app.ui.activities.BasketActivity;
 
 public class DrinksFragment extends Fragment {
     private Button viewBasketButton;
@@ -79,8 +81,7 @@ public class DrinksFragment extends Fragment {
         });
 
         viewBasketButton.setOnClickListener(v -> {
-            // TODO: Navigate to BasketFragment or show a bottom sheet
-            Toast.makeText(getContext(), "Tab clicked", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(getContext(), BasketActivity.class));
         });
 
         updateBasketButton(); // ensure UI is synced at launch
