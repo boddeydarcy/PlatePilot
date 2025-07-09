@@ -16,6 +16,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.tabs.TabLayout;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +36,6 @@ public class DessertsFragment extends Fragment implements BasketManager.BasketCh
 
     private TabLayout dessertTabs;
     private RecyclerView dessertRecyclerView;
-
     private Button viewBasketButton;
     private MenuAdapter adapter;
 
@@ -38,6 +44,7 @@ public class DessertsFragment extends Fragment implements BasketManager.BasketCh
     };
 
     private final List<MenuItem> dessertItems = new ArrayList<>();
+    private JSONObject menuJson;
 
     @Nullable
     @Override
@@ -76,6 +83,7 @@ public class DessertsFragment extends Fragment implements BasketManager.BasketCh
             @Override public void onTabReselected(TabLayout.Tab tab) {}
         });
 
+        loadMenuJson();
         loadDesserts(subCategories[0]);
         updateBasketButton();
 
@@ -84,37 +92,43 @@ public class DessertsFragment extends Fragment implements BasketManager.BasketCh
         });
     }
 
-    private void updateBasketButton() {
-        int count = BasketManager.getInstance().getItemCount();
-        double total = BasketManager.getInstance().getTotalPrice();
-        viewBasketButton.setText("View Tab (" + count + " items - £" + String.format("%.2f", total) + ")");
+    private void loadMenuJson() {
+        try (InputStream is = requireContext().getAssets().open("menu.json")) {
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            String jsonStr = new String(buffer, StandardCharsets.UTF_8);
+            menuJson = new JSONObject(jsonStr);
+        } catch (IOException | JSONException e) {
+            Toast.makeText(getContext(), "Failed to load menu", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void loadDesserts(String category) {
         dessertItems.clear();
+        if (menuJson == null) return;
 
-        switch (category) {
-            case "Cakes":
-                dessertItems.add(new MenuItem("de001", "Chocolate Cake", "5.00"));
-                dessertItems.add(new MenuItem("de002", "Carrot Cake", "4.80"));
-                break;
-            case "Ice Cream":
-                dessertItems.add(new MenuItem("de003", "Vanilla Ice Cream", "3.00"));
-                dessertItems.add(new MenuItem("de004", "Strawberry Ice Cream", "3.00"));
-                break;
-            case "Puddings":
-                dessertItems.add(new MenuItem("de005", "Sticky Toffee Pudding", "5.50"));
-                dessertItems.add(new MenuItem("de006", "Treacle Sponge", "5.00"));
-                break;
-            case "Fruit":
-                dessertItems.add(new MenuItem("de007", "Fruit Salad", "4.00"));
-                break;
-            case "Other":
-                dessertItems.add(new MenuItem("de008", "Cheesecake", "5.20"));
-                break;
+        try {
+            JSONObject dessertsObject = menuJson.getJSONObject("desserts");
+            JSONArray itemsArray = dessertsObject.getJSONArray(category);
+            for (int i = 0; i < itemsArray.length(); i++) {
+                JSONObject obj = itemsArray.getJSONObject(i);
+                String id = obj.getString("id");
+                String name = obj.getString("name");
+                String price = obj.getString("price");
+                dessertItems.add(new MenuItem(id, name, price));
+            }
+        } catch (JSONException e) {
+            Toast.makeText(getContext(), "No items for " + category, Toast.LENGTH_SHORT).show();
         }
 
         adapter.notifyDataSetChanged();
+    }
+
+    private void updateBasketButton() {
+        int count = BasketManager.getInstance().getItemCount();
+        double total = BasketManager.getInstance().getTotalPrice();
+        viewBasketButton.setText("View Tab (" + count + " items - £" + String.format("%.2f", total) + ")");
     }
 
     @Override

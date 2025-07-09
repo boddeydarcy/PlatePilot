@@ -16,6 +16,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.tabs.TabLayout;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +32,7 @@ import uk.edu.le.co2124.frontend_app.adapters.MenuAdapter;
 import uk.edu.le.co2124.frontend_app.data.MenuItem;
 import uk.edu.le.co2124.frontend_app.ui.activities.BasketActivity;
 
-public class SidesFragment extends Fragment implements BasketManager.BasketChangeListener{
+public class SidesFragment extends Fragment implements BasketManager.BasketChangeListener {
 
     private TabLayout sidesTabs;
     private RecyclerView sidesRecyclerView;
@@ -37,6 +44,7 @@ public class SidesFragment extends Fragment implements BasketManager.BasketChang
     };
 
     private final List<MenuItem> sideItems = new ArrayList<>();
+    private JSONObject menuJson;
 
     @Nullable
     @Override
@@ -71,10 +79,13 @@ public class SidesFragment extends Fragment implements BasketManager.BasketChang
                 loadSides(tab.getText().toString());
             }
 
-            @Override public void onTabUnselected(TabLayout.Tab tab) {}
-            @Override public void onTabReselected(TabLayout.Tab tab) {}
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {}
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {}
         });
 
+        loadMenuJson();
         loadSides(subCategories[0]);
         updateBasketButton();
 
@@ -83,38 +94,43 @@ public class SidesFragment extends Fragment implements BasketManager.BasketChang
         });
     }
 
-    private void updateBasketButton() {
-        int count = BasketManager.getInstance().getItemCount();
-        double total = BasketManager.getInstance().getTotalPrice();
-        viewBasketButton.setText("View Tab (" + count + " items - £" + String.format("%.2f", total) + ")");
+    private void loadMenuJson() {
+        try (InputStream is = requireContext().getAssets().open("menu.json")) {
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            String jsonStr = new String(buffer, StandardCharsets.UTF_8);
+            menuJson = new JSONObject(jsonStr);
+        } catch (IOException | JSONException e) {
+            Toast.makeText(getContext(), "Failed to load menu", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void loadSides(String category) {
         sideItems.clear();
+        if (menuJson == null) return;
 
-        switch (category) {
-            case "Chips":
-                sideItems.add(new MenuItem("si001", "French Fries", "3.00"));
-                sideItems.add(new MenuItem("si002", "Sweet Potato Fries", "3.50"));
-                break;
-            case "Veg":
-                sideItems.add(new MenuItem("si003", "Steamed Veg", "3.20"));
-                sideItems.add(new MenuItem("si004", "Grilled Asparagus", "3.80"));
-                break;
-            case "Rice":
-                sideItems.add(new MenuItem("si005", "Steamed Rice", "2.50"));
-                sideItems.add(new MenuItem("si006", "Pilaf Rice", "3.00"));
-                break;
-            case "Bread":
-                sideItems.add(new MenuItem("si007", "Naan Bread", "2.50"));
-                sideItems.add(new MenuItem("si008", "Ciabatta", "2.80"));
-                break;
-            case "Dips":
-                sideItems.add(new MenuItem("si009", "Garlic Mayo", "1.00"));
-                sideItems.add(new MenuItem("si010", "Spicy Salsa", "1.20"));
-                break;
+        try {
+            JSONObject sidesObject = menuJson.getJSONObject("sides");
+            JSONArray itemsArray = sidesObject.getJSONArray(category);
+            for (int i = 0; i < itemsArray.length(); i++) {
+                JSONObject obj = itemsArray.getJSONObject(i);
+                String id = obj.getString("id");
+                String name = obj.getString("name");
+                String price = obj.getString("price");
+                sideItems.add(new MenuItem(id, name, price));
+            }
+        } catch (JSONException e) {
+            Toast.makeText(getContext(), "No items for " + category, Toast.LENGTH_SHORT).show();
         }
+
         adapter.notifyDataSetChanged();
+    }
+
+    private void updateBasketButton() {
+        int count = BasketManager.getInstance().getItemCount();
+        double total = BasketManager.getInstance().getTotalPrice();
+        viewBasketButton.setText("View Tab (" + count + " items - £" + String.format("%.2f", total) + ")");
     }
 
     @Override

@@ -16,6 +16,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.tabs.TabLayout;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +32,7 @@ import uk.edu.le.co2124.frontend_app.adapters.MenuAdapter;
 import uk.edu.le.co2124.frontend_app.data.MenuItem;
 import uk.edu.le.co2124.frontend_app.ui.activities.BasketActivity;
 
-public class StartersFragment extends Fragment implements BasketManager.BasketChangeListener{
+public class StartersFragment extends Fragment implements BasketManager.BasketChangeListener {
 
     private TabLayout starterTabs;
     private RecyclerView starterRecyclerView;
@@ -34,6 +41,7 @@ public class StartersFragment extends Fragment implements BasketManager.BasketCh
 
     private final String[] subCategories = {"Soups", "Salads", "Bread", "Seafood", "Sharing"};
     private final List<MenuItem> starterItems = new ArrayList<>();
+    private JSONObject menuJson;
 
     @Nullable
     @Override
@@ -68,10 +76,13 @@ public class StartersFragment extends Fragment implements BasketManager.BasketCh
                 loadStarters(tab.getText().toString());
             }
 
-            @Override public void onTabUnselected(TabLayout.Tab tab) {}
-            @Override public void onTabReselected(TabLayout.Tab tab) {}
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {}
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {}
         });
 
+        loadMenuJson();
         loadStarters(subCategories[0]);
         updateBasketButton();
 
@@ -80,31 +91,43 @@ public class StartersFragment extends Fragment implements BasketManager.BasketCh
         });
     }
 
+    private void loadMenuJson() {
+        try (InputStream is = requireContext().getAssets().open("menu.json")) {
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            String jsonStr = new String(buffer, StandardCharsets.UTF_8);
+            menuJson = new JSONObject(jsonStr);
+        } catch (IOException | JSONException e) {
+            Toast.makeText(getContext(), "Failed to load menu", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void loadStarters(String category) {
+        starterItems.clear();
+        if (menuJson == null) return;
+
+        try {
+            JSONObject startersObject = menuJson.getJSONObject("starters");
+            JSONArray itemsArray = startersObject.getJSONArray(category);
+            for (int i = 0; i < itemsArray.length(); i++) {
+                JSONObject obj = itemsArray.getJSONObject(i);
+                String id = obj.getString("id");
+                String name = obj.getString("name");
+                String price = obj.getString("price");
+                starterItems.add(new MenuItem(id, name, price));
+            }
+        } catch (JSONException e) {
+            Toast.makeText(getContext(), "No items for " + category, Toast.LENGTH_SHORT).show();
+        }
+
+        adapter.notifyDataSetChanged();
+    }
+
     private void updateBasketButton() {
         int count = BasketManager.getInstance().getItemCount();
         double total = BasketManager.getInstance().getTotalPrice();
         viewBasketButton.setText("View Tab (" + count + " items - £" + String.format("%.2f", total) + ")");
-    }
-    private void loadStarters(String category) {
-        starterItems.clear();
-        switch (category) {
-            case "Soups":
-                starterItems.add(new MenuItem("s001", "Tomato Basil Soup", "4.50"));
-                break;
-            case "Salads":
-                starterItems.add(new MenuItem("s002", "Caesar Salad", "5.50"));
-                break;
-            case "Bread":
-                starterItems.add(new MenuItem("s003", "Garlic Bread", "3.00"));
-                break;
-            case "Seafood":
-                starterItems.add(new MenuItem("s004", "Prawn Cocktail", "6.50"));
-                break;
-            case "Sharing":
-                starterItems.add(new MenuItem("s005", "Sharing Platter", "8.50"));
-                break;
-        }
-        adapter.notifyDataSetChanged();
     }
 
     @Override

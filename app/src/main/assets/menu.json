@@ -1,0 +1,99 @@
+{
+  "starters": {
+    "Soups": [
+      { "id": "s001", "name": "Tomato Basil Soup", "price": "4.50" }
+    ],
+    "Salads": [
+      { "id": "s002", "name": "Caesar Salad", "price": "5.50" }
+    ],
+    "Bread": [
+      { "id": "s003", "name": "Garlic Bread", "price": "3.00" }
+    ],
+    "Seafood": [
+      { "id": "s004", "name": "Prawn Cocktail", "price": "6.50" }
+    ],
+    "Sharing": [
+      { "id": "s005", "name": "Sharing Platter", "price": "8.50" }
+    ]
+  },
+  "mains": {
+    "Pizza": [
+      { "id": "m001", "name": "Margherita", "price": "8.50" },
+      { "id": "m002", "name": "Pepperoni", "price": "9.50" },
+      { "id": "m003", "name": "BBQ Chicken", "price": "10.00" }
+    ],
+    "Pasta": [
+      { "id": "m004", "name": "Spaghetti Bolognese", "price": "9.00" },
+      { "id": "m005", "name": "Fettuccine Alfredo", "price": "9.50" },
+      { "id": "m006", "name": "Penne Arrabbiata", "price": "8.50" }
+    ],
+    "Beef": [
+      { "id": "m007", "name": "Beef Burger", "price": "10.50" },
+      { "id": "m008", "name": "Steak Frites", "price": "14.00" }
+    ],
+    "Lamb": [
+      { "id": "m009", "name": "Lamb Shank", "price": "13.50" },
+      { "id": "m010", "name": "Grilled Lamb Kofta", "price": "11.00" }
+    ],
+    "Chicken": [
+      { "id": "m011", "name": "Grilled Chicken Breast", "price": "10.00" },
+      { "id": "m012", "name": "Chicken Parmesan", "price": "11.00" }
+    ],
+    "Vegetarian": [
+      { "id": "m013", "name": "Vegetarian Lasagna", "price": "9.00" },
+      { "id": "m014", "name": "Stuffed Peppers", "price": "8.50" }
+    ],
+    "Vegan": [
+      { "id": "m015", "name": "Vegan Burger", "price": "9.50" },
+      { "id": "m016", "name": "Chickpea Curry", "price": "8.50" }
+    ]
+  },
+  "desserts": {
+    "Cakes": [
+      { "id": "d001", "name": "Chocolate Cake", "price": "4.50" }
+    ],
+    "Ice Cream": [
+      { "id": "d002", "name": "Vanilla Ice Cream", "price": "3.00" }
+    ]
+  },
+  "sides": {
+    "Chips": [
+      { "id": "sd001", "name": "Skin-on Fries", "price": "3.00" }
+    ],
+    "Vegetables": [
+      { "id": "sd002", "name": "Steamed Broccoli", "price": "2.50" }
+    ]
+  },
+  "drinks": {
+    "Soft Drinks": [
+      { "id": "dr001", "name": "Coca-Cola", "price": "2.00" }
+    ],
+    "Red Wine": [
+      { "id": "dr002", "name": "Merlot", "price": "5.00" }
+    ],
+    "White Wine": [
+      { "id": "dr003", "name": "Chardonnay", "price": "5.00" }
+    ],
+    "Rosé": [
+      { "id": "dr004", "name": "Zinfandel Rosé", "price": "5.00" }
+    ],
+    "Sparkling Wine": [
+      { "id": "dr005", "name": "Prosecco", "price": "6.00" }
+    ],
+    "Draught Beer": [
+      { "id": "dr006", "name": "Lager Pint", "price": "4.50" }
+    ],
+    "Bottled Beer": [
+      { "id": "dr007", "name": "Craft IPA", "price": "4.00" }
+    ],
+    "Cocktails": [
+      { "id": "dr008", "name": "Mojito", "price": "6.50" }
+    ],
+    "Mocktails": [
+      { "id": "dr009", "name": "Virgin Mary", "price": "4.50" }
+    ],
+    "Hot Drinks": [
+      { "id": "dr010", "name": "Cappuccino", "price": "3.00" }
+    ]
+  }
+}

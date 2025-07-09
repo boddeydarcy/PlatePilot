@@ -16,8 +16,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.tabs.TabLayout;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import uk.edu.le.co2124.frontend_app.BasketManager;
 import uk.edu.le.co2124.frontend_app.R;
@@ -25,7 +33,7 @@ import uk.edu.le.co2124.frontend_app.adapters.MenuAdapter;
 import uk.edu.le.co2124.frontend_app.data.MenuItem;
 import uk.edu.le.co2124.frontend_app.ui.activities.BasketActivity;
 
-public class MainsFragment extends Fragment implements BasketManager.BasketChangeListener{
+public class MainsFragment extends Fragment implements BasketManager.BasketChangeListener {
 
     private TabLayout mainsSubTabs;
     private RecyclerView mainsRecyclerView;
@@ -37,6 +45,7 @@ public class MainsFragment extends Fragment implements BasketManager.BasketChang
     };
 
     private final List<MenuItem> mainsItems = new ArrayList<>();
+    private JSONObject menuJson;
 
     @Nullable
     @Override
@@ -72,15 +81,12 @@ public class MainsFragment extends Fragment implements BasketManager.BasketChang
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-            }
-
+            public void onTabUnselected(TabLayout.Tab tab) {}
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-            }
+            public void onTabReselected(TabLayout.Tab tab) {}
         });
 
-        // Default load
+        loadMenuJson();
         loadMainsForSubcategory(subCategories[0]);
         updateBasketButton();
 
@@ -95,46 +101,34 @@ public class MainsFragment extends Fragment implements BasketManager.BasketChang
         viewBasketButton.setText("View Tab (" + count + " items - £" + String.format("%.2f", total) + ")");
     }
 
+    private void loadMenuJson() {
+        try (InputStream is = requireContext().getAssets().open("menu.json")) {
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            String jsonStr = new String(buffer, StandardCharsets.UTF_8);
+            menuJson = new JSONObject(jsonStr);
+        } catch (IOException | JSONException e) {
+            Toast.makeText(getContext(), "Failed to load menu", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void loadMainsForSubcategory(String subCategory) {
         mainsItems.clear();
+        if (menuJson == null) return;
 
-        switch (subCategory) {
-            case "Pizza":
-                mainsItems.add(new MenuItem("m001", "Margherita", "8.50"));
-                mainsItems.add(new MenuItem("m002", "Pepperoni", "9.50"));
-                mainsItems.add(new MenuItem("m003", "BBQ Chicken", "10.00"));
-                break;
-
-            case "Pasta":
-                mainsItems.add(new MenuItem("m004", "Spaghetti Bolognese", "9.00"));
-                mainsItems.add(new MenuItem("m005", "Fettuccine Alfredo", "9.50"));
-                mainsItems.add(new MenuItem("m006", "Penne Arrabbiata", "8.50"));
-                break;
-
-            case "Beef":
-                mainsItems.add(new MenuItem("m007", "Beef Burger", "10.50"));
-                mainsItems.add(new MenuItem("m008", "Steak Frites", "14.00"));
-                break;
-
-            case "Lamb":
-                mainsItems.add(new MenuItem("m009", "Lamb Shank", "13.50"));
-                mainsItems.add(new MenuItem("m010", "Grilled Lamb Kofta", "11.00"));
-                break;
-
-            case "Chicken":
-                mainsItems.add(new MenuItem("m011", "Grilled Chicken Breast", "10.00"));
-                mainsItems.add(new MenuItem("m012", "Chicken Parmesan", "11.00"));
-                break;
-
-            case "Vegetarian":
-                mainsItems.add(new MenuItem("m013", "Vegetarian Lasagna", "9.00"));
-                mainsItems.add(new MenuItem("m014", "Stuffed Peppers", "8.50"));
-                break;
-
-            case "Vegan":
-                mainsItems.add(new MenuItem("m015", "Vegan Burger", "9.50"));
-                mainsItems.add(new MenuItem("m016", "Chickpea Curry", "8.50"));
-                break;
+        try {
+            JSONObject mainsObject = menuJson.getJSONObject("mains");
+            JSONArray itemsArray = mainsObject.getJSONArray(subCategory);
+            for (int i = 0; i < itemsArray.length(); i++) {
+                JSONObject obj = itemsArray.getJSONObject(i);
+                String id = obj.getString("id");
+                String name = obj.getString("name");
+                String price = obj.getString("price");
+                mainsItems.add(new MenuItem(id, name, price));
+            }
+        } catch (JSONException e) {
+            Toast.makeText(getContext(), "No items for " + subCategory, Toast.LENGTH_SHORT).show();
         }
 
         adapter.notifyDataSetChanged();

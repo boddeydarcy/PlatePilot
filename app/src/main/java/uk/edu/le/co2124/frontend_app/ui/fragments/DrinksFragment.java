@@ -16,6 +16,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.tabs.TabLayout;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +32,7 @@ import uk.edu.le.co2124.frontend_app.adapters.MenuAdapter;
 import uk.edu.le.co2124.frontend_app.data.MenuItem;
 import uk.edu.le.co2124.frontend_app.ui.activities.BasketActivity;
 
-public class DrinksFragment extends Fragment implements BasketManager.BasketChangeListener{
+public class DrinksFragment extends Fragment implements BasketManager.BasketChangeListener {
     private Button viewBasketButton;
     private TabLayout drinksSubTabs;
     private RecyclerView drinksRecyclerView;
@@ -37,6 +44,7 @@ public class DrinksFragment extends Fragment implements BasketManager.BasketChan
     };
 
     private final List<MenuItem> drinkItems = new ArrayList<>();
+    private JSONObject menuJson;
 
     @Nullable
     @Override
@@ -50,7 +58,7 @@ public class DrinksFragment extends Fragment implements BasketManager.BasketChan
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         drinksSubTabs = view.findViewById(R.id.drinksTabs);
         drinksRecyclerView = view.findViewById(R.id.drinksRecyclerView);
-        viewBasketButton = view.findViewById(R.id.viewBasketButton); // must match layout ID
+        viewBasketButton = view.findViewById(R.id.viewBasketButton);
 
         adapter = new MenuAdapter(drinkItems, item -> {
             BasketManager.getInstance().addItem(item);
@@ -72,83 +80,58 @@ public class DrinksFragment extends Fragment implements BasketManager.BasketChan
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-            }
+            public void onTabUnselected(TabLayout.Tab tab) {}
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-            }
+            public void onTabReselected(TabLayout.Tab tab) {}
         });
+
+        loadMenuJson();
+        loadDrinksForSubcategory(subCategories[0]);
+        updateBasketButton();
 
         viewBasketButton.setOnClickListener(v -> {
             startActivity(new Intent(getContext(), BasketActivity.class));
         });
+    }
 
-        updateBasketButton(); // ensure UI is synced at launch
+    private void loadMenuJson() {
+        try (InputStream is = requireContext().getAssets().open("menu.json")) {
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            String jsonStr = new String(buffer, StandardCharsets.UTF_8);
+            menuJson = new JSONObject(jsonStr);
+        } catch (IOException | JSONException e) {
+            Toast.makeText(getContext(), "Failed to load menu", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void loadDrinksForSubcategory(String subCategory) {
+        drinkItems.clear();
+        if (menuJson == null) return;
+
+        try {
+            JSONObject drinksObject = menuJson.getJSONObject("drinks");
+            JSONArray itemsArray = drinksObject.getJSONArray(subCategory);
+            for (int i = 0; i < itemsArray.length(); i++) {
+                JSONObject obj = itemsArray.getJSONObject(i);
+                String id = obj.getString("id");
+                String name = obj.getString("name");
+                String price = obj.getString("price");
+                drinkItems.add(new MenuItem(id, name, price));
+            }
+        } catch (JSONException e) {
+            Toast.makeText(getContext(), "No items for " + subCategory, Toast.LENGTH_SHORT).show();
+        }
+
+        adapter.notifyDataSetChanged();
     }
 
     private void updateBasketButton() {
         int count = BasketManager.getInstance().getItemCount();
         double total = BasketManager.getInstance().getTotalPrice();
         viewBasketButton.setText("View Tab (" + count + " items - £" + String.format("%.2f", total) + ")");
-    }
-
-    private void loadDrinksForSubcategory(String subCategory) {
-        drinkItems.clear();
-
-        switch (subCategory) {
-            case "Soft Drinks":
-                drinkItems.add(new MenuItem("d001", "Coca-Cola", "2.50"));
-                drinkItems.add(new MenuItem("d002", "Sprite", "2.50"));
-                drinkItems.add(new MenuItem("d003", "Fanta", "2.50"));
-                break;
-
-            case "Red Wine":
-                drinkItems.add(new MenuItem("d004", "Merlot", "6.00"));
-                drinkItems.add(new MenuItem("d005", "Cabernet Sauvignon", "6.50"));
-                break;
-
-            case "White Wine":
-                drinkItems.add(new MenuItem("d006", "Sauvignon Blanc", "6.00"));
-                drinkItems.add(new MenuItem("d007", "Chardonnay", "6.50"));
-                break;
-
-            case "Rosé":
-                drinkItems.add(new MenuItem("d008", "Zinfandel Rosé", "6.00"));
-                break;
-
-            case "Sparkling Wine":
-                drinkItems.add(new MenuItem("d009", "Prosecco", "7.00"));
-                break;
-
-            case "Draught Beer":
-                drinkItems.add(new MenuItem("d010", "Guinness Pint", "5.50"));
-                drinkItems.add(new MenuItem("d011", "Heineken Pint", "5.00"));
-                break;
-
-            case "Bottled Beer":
-                drinkItems.add(new MenuItem("d012", "Corona", "4.00"));
-                drinkItems.add(new MenuItem("d013", "Budweiser", "4.00"));
-                break;
-
-            case "Cocktails":
-                drinkItems.add(new MenuItem("d014", "Mojito", "7.50"));
-                drinkItems.add(new MenuItem("d015", "Margarita", "7.50"));
-                break;
-
-            case "Mocktails":
-                drinkItems.add(new MenuItem("d016", "Virgin Mojito", "5.00"));
-                drinkItems.add(new MenuItem("d017", "Nojito", "5.00"));
-                break;
-
-            case "Hot Drinks":
-                drinkItems.add(new MenuItem("d018", "Espresso", "2.00"));
-                drinkItems.add(new MenuItem("d019", "Cappuccino", "2.50"));
-                drinkItems.add(new MenuItem("d020", "Tea", "2.00"));
-                break;
-        }
-
-        adapter.notifyDataSetChanged();
     }
 
     @Override
