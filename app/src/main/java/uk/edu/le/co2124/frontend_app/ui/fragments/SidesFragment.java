@@ -25,7 +25,7 @@ import uk.edu.le.co2124.frontend_app.adapters.MenuAdapter;
 import uk.edu.le.co2124.frontend_app.data.MenuItem;
 import uk.edu.le.co2124.frontend_app.ui.activities.BasketActivity;
 
-public class SidesFragment extends Fragment {
+public class SidesFragment extends Fragment implements BasketManager.BasketChangeListener{
 
     private TabLayout sidesTabs;
     private RecyclerView sidesRecyclerView;
@@ -115,5 +115,28 @@ public class SidesFragment extends Fragment {
                 break;
         }
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        BasketManager.getInstance().addListener(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        BasketManager.getInstance().removeListener(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateBasketButton();
+    }
+
+    @Override
+    public void onBasketChanged() {
+        updateBasketButton();
     }
 }

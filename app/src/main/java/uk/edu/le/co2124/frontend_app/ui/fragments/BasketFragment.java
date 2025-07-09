@@ -19,10 +19,11 @@ import uk.edu.le.co2124.frontend_app.R;
 import uk.edu.le.co2124.frontend_app.adapters.BasketAdapter;
 import uk.edu.le.co2124.frontend_app.data.MenuItem;
 
-public class BasketFragment extends Fragment {
+public class BasketFragment extends Fragment implements BasketAdapter.OnBasketChangedListener {
 
     private RecyclerView basketRecyclerView;
     private TextView totalPriceText;
+    private BasketAdapter adapter;
 
     @Nullable
     @Override
@@ -39,9 +40,19 @@ public class BasketFragment extends Fragment {
 
         List<MenuItem> items = BasketManager.getInstance().getItems();
 
+        adapter = new BasketAdapter(items, this);
         basketRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        basketRecyclerView.setAdapter(new BasketAdapter(items));
+        basketRecyclerView.setAdapter(adapter);
 
+        updateTotalPrice();
+    }
+
+    @Override
+    public void onBasketUpdated() {
+        updateTotalPrice();
+    }
+
+    private void updateTotalPrice() {
         double total = BasketManager.getInstance().getTotalPrice();
         totalPriceText.setText("Total: £" + String.format("%.2f", total));
     }

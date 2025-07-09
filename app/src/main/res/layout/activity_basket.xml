@@ -8,7 +8,7 @@
         android:id="@+id/basketToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
+        android:background="#AB9CBC"
         android:title="Your Tab"
         android:titleTextColor="@android:color/white" />
 

@@ -9,6 +9,12 @@ public class BasketManager {
     private static BasketManager instance;
     private final List<MenuItem> items = new ArrayList<>();
 
+    public interface BasketChangeListener {
+        void onBasketChanged();
+    }
+
+    private final List<BasketChangeListener> listeners = new ArrayList<>();
+
     public static BasketManager getInstance() {
         if (instance == null) {
             instance = new BasketManager();
@@ -18,6 +24,28 @@ public class BasketManager {
 
     public void addItem(MenuItem item) {
         items.add(item);
+        notifyListeners();
+    }
+
+    public void removeItem(int index) {
+        if (index >= 0 && index < items.size()) {
+            items.remove(index);
+            notifyListeners();
+        }
+    }
+
+    public void addListener(BasketChangeListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeListener(BasketChangeListener listener) {
+        listeners.remove(listener);
+    }
+
+    private void notifyListeners() {
+        for (BasketChangeListener listener : listeners) {
+            listener.onBasketChanged();
+        }
     }
 
     public List<MenuItem> getItems() {
@@ -42,5 +70,6 @@ public class BasketManager {
 
     public void clear() {
         items.clear();
+        notifyListeners();
     }
 }

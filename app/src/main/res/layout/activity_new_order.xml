@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         app:title="New Order"
         app:titleTextColor="@android:color/white"
-        android:background="?attr/colorPrimary"
+        android:background="#AB9CBC"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
