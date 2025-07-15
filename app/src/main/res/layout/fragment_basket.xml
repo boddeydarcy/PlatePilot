@@ -23,4 +23,13 @@
         android:layout_marginBottom="12dp" />
 
     <!-- Optional: Add action buttons below if needed -->
+    <Button
+        android:id="@+id/confirmOrderButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Confirm Order"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/green"
+        android:textColor="@android:color/white" />
+
 </LinearLayout>

@@ -6,9 +6,9 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
+import uk.edu.le.co2124.frontend_app.data.OrderItem;
 
 public interface OrderService {
-
-    @POST("api/orders") // matches your Spring Boot endpoint
-    Call<ResponseBody> submitOrder(@Body List<OrderItem> items);
+    @POST("/api/orders")
+    Call<Void> submitOrder(@Body List<OrderItem> items);
 }

@@ -4,7 +4,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,6 +14,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import retrofit2.Call;
+import retrofit2.Response;
+import uk.edu.le.co2124.frontend_app.network.ApiClient;
+import uk.edu.le.co2124.frontend_app.network.OrderService;
+import uk.edu.le.co2124.frontend_app.data.OrderItem;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import uk.edu.le.co2124.frontend_app.BasketManager;
@@ -45,6 +54,35 @@ public class BasketFragment extends Fragment implements BasketAdapter.OnBasketCh
         basketRecyclerView.setAdapter(adapter);
 
         updateTotalPrice();
+
+        Button confirmButton = view.findViewById(R.id.confirmOrderButton);
+
+        confirmButton.setOnClickListener(v -> {
+            List<MenuItem> basketItems = BasketManager.getInstance().getItems();
+            List<OrderItem> orderItems = new ArrayList<>();
+
+//            for (MenuItem item : basketItems) {
+//                orderItems.add(new OrderItem(item.getId(), 1)); // or actual quantity if tracked
+//
+
+            OrderService service = ApiClient.getService();
+            service.submitOrder(orderItems).enqueue(new retrofit2.Callback<Void>() {
+                @Override
+                public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                    if (response.isSuccessful()) {
+                        Toast.makeText(getContext(), "Order submitted!", Toast.LENGTH_SHORT).show();
+                        BasketManager.getInstance().clear(); // Optional: clear basket
+                    } else {
+                        Toast.makeText(getContext(), "Failed: " + response.code(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                    Toast.makeText(getContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
     }
 
     @Override

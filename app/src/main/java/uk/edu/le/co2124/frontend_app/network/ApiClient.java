@@ -4,8 +4,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
-
-    private static final String BASE_URL = "http://10.0.2.2:8080/"; // for Android emulator
+    private static final String BASE_URL = "http://10.0.2.2:8080"; // use actual IP or domain in production
     private static Retrofit retrofit;
 
     public static Retrofit getRetrofit() {
@@ -16,5 +15,9 @@ public class ApiClient {
                     .build();
         }
         return retrofit;
+    }
+
+    public static OrderService getService() {
+        return getRetrofit().create(OrderService.class);
     }
 }
