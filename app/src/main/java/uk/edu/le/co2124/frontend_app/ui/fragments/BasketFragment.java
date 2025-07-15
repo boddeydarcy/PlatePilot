@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
 import uk.edu.le.co2124.frontend_app.network.ApiClient;
 import uk.edu.le.co2124.frontend_app.network.OrderService;
@@ -58,32 +59,29 @@ public class BasketFragment extends Fragment implements BasketAdapter.OnBasketCh
         Button confirmButton = view.findViewById(R.id.confirmOrderButton);
 
         confirmButton.setOnClickListener(v -> {
-            List<MenuItem> basketItems = BasketManager.getInstance().getItems();
-            List<OrderItem> orderItems = new ArrayList<>();
+            List<OrderItem> orderItems = BasketManager.getInstance().getOrderItems();
 
-//            for (MenuItem item : basketItems) {
-//                orderItems.add(new OrderItem(item.getId(), 1)); // or actual quantity if tracked
-//
-
-            OrderService service = ApiClient.getService();
-            service.submitOrder(orderItems).enqueue(new retrofit2.Callback<Void>() {
+            ApiClient.getApiService().submitOrder(orderItems).enqueue(new Callback<Void>() {
                 @Override
-                public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                public void onResponse(Call<Void> call, Response<Void> response) {
                     if (response.isSuccessful()) {
-                        Toast.makeText(getContext(), "Order submitted!", Toast.LENGTH_SHORT).show();
-                        BasketManager.getInstance().clear(); // Optional: clear basket
+                        Toast.makeText(requireContext(), "Order sent!", Toast.LENGTH_SHORT).show();
+                        BasketManager.getInstance().clear(); // Optional: clear basket after sending
+                        adapter.notifyDataSetChanged(); // Update UI
+                        updateTotalPrice();
                     } else {
-                        Toast.makeText(getContext(), "Failed: " + response.code(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "Failed to send order. Code: " + response.code(), Toast.LENGTH_LONG).show();
                     }
                 }
 
                 @Override
-                public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                    Toast.makeText(getContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                public void onFailure(Call<Void> call, Throwable t) {
+                    Toast.makeText(requireContext(), "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
         });
     }
+
 
     @Override
     public void onBasketUpdated() {

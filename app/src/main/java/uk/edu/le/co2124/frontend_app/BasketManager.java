@@ -2,6 +2,7 @@ package uk.edu.le.co2124.frontend_app;
 
 import java.util.ArrayList;
 import java.util.List;
+import uk.edu.le.co2124.frontend_app.data.OrderItem;
 
 import uk.edu.le.co2124.frontend_app.data.MenuItem;
 
@@ -71,5 +72,14 @@ public class BasketManager {
     public void clear() {
         items.clear();
         notifyListeners();
+    }
+
+
+    public List<OrderItem> getOrderItems() {
+        List<OrderItem> orderItems = new ArrayList<>();
+        for (MenuItem item : items) {
+            orderItems.add(new OrderItem(item.getId(), 1)); // Assuming quantity = 1 for now
+        }
+        return orderItems;
     }
 }
