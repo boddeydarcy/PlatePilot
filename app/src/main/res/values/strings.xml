@@ -1,20 +1,39 @@
 <resources>
     <string name="app_name">Four Seasons Ashby</string>
     <string name="action_settings">Settings</string>
-    <!-- Strings used for fragments for navigation -->
+
+    <!-- Navigation Labels -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
+
+    <!-- Order Display -->
     <string name="order_id">Order ID</string>
     <string name="status">Status</string>
     <string name="items">Items</string>
-
     <string name="order_id_display">Order ID: #%1$s</string>
     <string name="status_display">Status: %1$s</string>
     <string name="item_count_display">Items: %1$d</string>
 
+    <!-- Main Dashboard -->
     <string name="initials_placeholder">DB</string>
     <string name="new_order">New Order</string>
     <string name="view_orders">View Orders</string>
+
+    <!-- Profile / Account -->
+    <string name="logout">Logout</string>
+    <string name="profile_name">Name:</string>
+    <string name="profile_role_label">Role:</string>
+    <string name="profile_role_admin">Admin</string>
+    <string name="profile_role_staff">Staff</string>
+    <string name="back">Back</string>
+
+    <!-- Login -->
+    <string name="login_title">Login</string>
+    <string name="username_hint">Username</string>
+    <string name="password_hint">Password</string>
+    <string name="login_button">Login</string>
+    <string name="login_success">Login successful</string>
+    <string name="login_error">Invalid credentials</string>
 </resources>
