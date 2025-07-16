@@ -7,8 +7,8 @@ import java.util.List;
 @Entity
 public class kitchenOrder {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<kitchenOrderItem> items;
@@ -22,7 +22,7 @@ public class kitchenOrder {
         this.status = status;
     }
 
-    public String getId() { return id; }
+    public Long getId() { return id; }
     public List<kitchenOrderItem> getItems() { return items; }
     public String getStatus() { return status; }
 
